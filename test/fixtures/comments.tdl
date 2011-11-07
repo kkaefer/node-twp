@@ -1,0 +1,18 @@
+// comment /*
+
+protocol  Calculator =  ID 5 {
+  typedef   // line comment */
+     Term;
+
+  union/**/Term/*
+*/{case//*
+0//*
+	://*
+		int value;case 1: string str; }
+
+
+				/*  /****/	}
+				
+				
+				
+				

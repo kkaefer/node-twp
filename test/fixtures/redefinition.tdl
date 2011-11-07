@@ -1,0 +1,4 @@
+protocol Foo = ID 9 {
+  typedef Term;
+    typedef Term;
+}

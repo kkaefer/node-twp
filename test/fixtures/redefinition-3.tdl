@@ -1,0 +1,6 @@
+protocol Foo = ID 9 {
+  struct Term {
+    int first;
+    int first;
+  }
+}

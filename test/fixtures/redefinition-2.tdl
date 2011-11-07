@@ -1,0 +1,11 @@
+protocol Foo = ID 9 {
+  typedef Term;
+  struct Term {
+    int first;
+    int second;
+  }
+  struct Term {
+    int third;
+    int fourth;
+  }
+}

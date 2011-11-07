@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var fs = require('fs');
+var tdl = require('./tdl');
+
+if (process.argv.length !== 3) {
+    console.warn('Usage: ' + process.env._ + ' [filename]');
+    process.exit(1);
+}
+
+var filename = path.join(process.env.PWD, process.argv[2]);
+
+try {
+    fs.statSync(filename);
+} catch(err) {
+    console.warn(err.message);
+    process.exit(1);
+}
+
+try {
+    var api = new tdl.Interface();
+    api.addFile(filename);
+} catch(err) {
+    console.warn(err.stack);
+    process.exit(1);
+}

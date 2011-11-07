@@ -1,0 +1,15 @@
+{
+  "name": "twp",
+  "version": "0.0.1",
+  "description": "The Wire Protocol client and server",
+  "author": "Konstantin Käfer <github@kkaefer.com>",
+  "engines": { "node": "~0.4.12" },
+
+  "bin": {
+      "validate": "./bin/validate"
+  },
+
+  "devDependencies": {
+      "expresso": "~0.9.0"
+  }
+}
