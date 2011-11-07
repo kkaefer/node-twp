@@ -1,14 +1,15 @@
-# NAME
+## NAME
 
 node-twp - The Wire Protocol client and server.
 
 
-# SYNOPSIS
+## SYNOPSIS
 
 This is not the module you are looking for. Move along.
 
 
-# INSTALLATION
+## INSTALLATION
 
 * Install node (e.g. with [nvm](https://github.com/creationix/nvm))
 * Install [npm](http://npmjs.org/)
+* `npm install https://github.com/kkaefer/node-twp/tarball/master`
