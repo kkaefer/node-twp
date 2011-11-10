@@ -1,0 +1,6 @@
+protocol Foo = ID 9 {
+  message N = ID 5 {
+    int M;
+    any defined by M foo;
+  }
+}

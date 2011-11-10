@@ -26,7 +26,12 @@ var tests = {
         message: 'Expected "message", "sequence", "struct", "typedef", "union" or "}" but "t" found.',
         line: 2, column: 3
     },
-    'comments': null
+    'comments': null,
+    'any-defined-by-missing': {
+        message: 'Field "foo" references unknown field "M".',
+        line: 7, column: 5
+    },
+    'any-defined-by': null
 };
 
 for (var name in tests) (function(test, name) {

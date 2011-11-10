@@ -1,0 +1,9 @@
+protocol Foo = ID 9 {
+  struct M {
+    int p;
+  }
+
+  message N = ID 5 {
+    any defined by M foo;
+  }
+}

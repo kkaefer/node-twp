@@ -22,8 +22,8 @@ number "number"
   { return parseInt(digits.join(''), 10); }
 
 _any
-  = "any" _S "defined" _S "by" _S name:identifier
-  { return { pos: savedPos0, references: name.value } }
+  = type:"any" _S "defined" _S "by" _S name:identifier
+  { return { "type": type, references: name.value, pos: savedPos0 } }
 
 type
   = _any / primitiveType / identifier

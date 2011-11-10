@@ -151,14 +151,13 @@ Interface.prototype.validateField = function(field, locals) {
         throw new SemanticError(message, this.position(field.pos));
     }
 
-    // Ensure that any-defined-by fields reference a valid type.
+    // Ensure that any-defined-by fields reference a valid field.
     if (field.type.references) {
         if (!locals[field.type.references]) {
             var message = 'Field "' + name + '" references unknown field "' + 
                 field.type.references + '".';
             throw new SemanticError(message, this.position(field.pos));
         }
-        field.type = locals[field.type.references].type;
     }
 
     // Ensure that the referenced type has been declared. We only check
