@@ -1,0 +1,11 @@
+protocol Foo = ID 5 {
+  union x {
+    case 0: int foo;
+    case 1: int bar;
+  }
+
+  // failure, foo is already defined in union.
+  struct foo {
+    int baz;
+  }
+}

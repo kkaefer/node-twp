@@ -103,16 +103,20 @@ Interface.prototype.declareIdentfier = function(entity) {
     var typedef = entity.kind === 'typedef';
     if (type && (type.kind !== 'typedef' || typedef)) {
         var pos = this.position(type.pos);
-        var message = 'Type "' + entity.name.value + '" ' + 'was already ' +
-        (typedef ? 'declared' : 'defined as ' + type.kind) + ' ' +
-        'on line ' + pos.line + ', column ' + pos.column + '.';
+        var message = 'Can\'t ' +
+            (typedef ? 'redeclare' : 'redefine') +
+            ' type "' + entity.name.value + '"' +
+            (typedef ? '' : ' as ' + entity.kind) + '. ' +
+            'Previously ' +
+            (typedef ? 'declared' : 'defined as ' + type.kind) + ' ' +
+            'on line ' + pos.line + ', column ' + pos.column + '.';
         throw new SemanticError(message, this.position(entity.pos));
     }
     this.identifiers[entity.name.value] = entity;
 };
 
 Interface.prototype.ensureType = function(name) {
-    if (!this.types[name.value]) {
+    if (name.value && !this.types[name.value]) {
         var message = 'Type "' + name.value + '" is not declared.';
         throw new SemanticError(message, this.position(name.pos));
     }
@@ -154,7 +158,7 @@ Interface.prototype.validateField = function(field, locals) {
     // Ensure that any-defined-by fields reference a valid field.
     if (field.type.references) {
         if (!locals[field.type.references]) {
-            var message = 'Field "' + name + '" references unknown field "' + 
+            var message = 'Field "' + name + '" references unknown field "' +
                 field.type.references + '".';
             throw new SemanticError(message, this.position(field.pos));
         }
@@ -169,24 +173,38 @@ Interface.prototype.validateField = function(field, locals) {
     locals[field.name.value] = field;
 };
 
-Interface.prototype.validateFields = function(fields) {
-    var namespace = {};
+Interface.prototype.validateFields = function(fields, locals) {
     fields.forEach(function(field) {
-        this.validateField(field, namespace);
+        this.validateField(field, locals);
     }, this);
 };
 
 Interface.prototype.validateStruct = function(entity) {
-    this.validateFields(entity.fields);
-    this.types[entity.name.value] = true;
-};
-
-Interface.prototype.validateUnion = function(entity) {
-    this.validateFields(entity.cases);
+    this.validateFields(entity.fields, {});
     this.types[entity.name.value] = true;
 };
 
 Interface.prototype.validateMessage = function(entity) {
-    this.validateFields(entity.fields);
+    this.validateFields(entity.fields, {});
     this.messages[entity.name.value] = true;
 };
+
+Interface.prototype.validateUnion = function(entity) {
+    var cases = {};
+    entity.cases.forEach(function(field) {
+        // Enforce unique case numbers.
+        if (cases[field.number]) {
+            var previous = cases[field.number];
+            var pos = this.position(previous.pos);
+            var type = previous.type.value || previous.type;
+            var message = 'Case ' + field.number + ' was already used ' +
+                'to define ' + type + ' ' + previous.name.value + ' ' +
+                'on line ' + pos.line + ', column ' + pos.column + '.';
+            throw new SemanticError(message, this.position(field.pos));
+        }
+        cases[field.number] = field;
+        this.validateField(field, this.identifiers);
+    }, this);
+    this.types[entity.name.value] = true;
+};
+

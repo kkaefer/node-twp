@@ -1,0 +1,7 @@
+protocol Foo = ID 5 {
+  sequence<int> baz;
+  union x {
+    case 3: baz foo;
+    case 3: int bar;
+  }
+}

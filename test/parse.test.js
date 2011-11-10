@@ -11,11 +11,11 @@ var tests = {
         line: 2, column: 3
     },
     'redefinition': {
-        message: 'Type "Term" was already declared on line 2, column 3.',
+        message: 'Can\'t redeclare type "Term". Previously declared on line 2, column 3.',
         line: 3, column: 5
     },
     'redefinition-2': {
-        message: 'Type "Term" was already defined as struct on line 3, column 3.',
+        message: 'Can\'t redefine type "Term" as struct. Previously defined as struct on line 3, column 3.',
         line: 7, column: 3
     },
     'redefinition-3': {
@@ -31,7 +31,19 @@ var tests = {
         message: 'Field "foo" references unknown field "M".',
         line: 7, column: 5
     },
-    'any-defined-by': null
+    'any-defined-by': null,
+    'sequence-missing': {
+        message: 'Type "bar" is not declared.',
+        line: 2, column: 12
+    },
+    'namespace-identifiers': {
+        message: 'Can\'t redefine type "foo" as struct. Previously defined as case on line 3, column 5.',
+        line: 8, column: 3
+    },
+    'union-case-numbers': {
+        message: 'Case 3 was already used to define baz foo on line 4, column 5.',
+        line: 5, column: 5
+    }
 };
 
 for (var name in tests) (function(test, name) {
@@ -41,12 +53,13 @@ for (var name in tests) (function(test, name) {
         } catch (err) {
             var thrown = true;
             if (!test) throw err;
-            for (var key in test) {
-                assert.equal(test[key], err[key]);
-            }
+            assert.equal(test.message, err.message);
+            assert.equal(test.line, err.line);
+            assert.equal(test.column, err.column);
         }
         if (!thrown && test) {
-            throw new Error('Expected error ' + test.message);
+            throw new Error('Expected error ' + test.message +
+                ' on line ' + test.line + ', column ' + test.column);
         }
     };
 })(tests[name], name);

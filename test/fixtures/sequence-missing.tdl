@@ -1,0 +1,6 @@
+protocol Foo = ID 9 {
+  sequence<bar> boo;
+  struct Boo {
+    boo baz;
+  }
+}
