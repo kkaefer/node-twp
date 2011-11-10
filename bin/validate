@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var tdl = require('../tdl');
+var tdl = require('../lib/tdl');
 
 if (process.argv.length !== 3) {
     console.warn('Usage: ' + process.env._ + ' [filename]');

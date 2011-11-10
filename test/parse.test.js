@@ -1,6 +1,6 @@
 var assert = require('assert');
 var fs = require('fs');
-var tdl = require('../tdl');
+var tdl = require('../lib/tdl');
 
 var tests = {
     'empty': null,
