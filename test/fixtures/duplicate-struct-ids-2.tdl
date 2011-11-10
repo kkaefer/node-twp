@@ -1,0 +1,7 @@
+struct Request= ID 0 {
+  string text;
+}
+
+struct Reply= ID 0 {
+  string text;
+}

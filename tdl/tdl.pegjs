@@ -6,7 +6,7 @@ specification
   { return root; }
 
 protocol
-  = kind:"protocol" _S name:identifier _ "=" _ "ID" _S id:number _
+  = kind:"protocol" _S name:identifier _ "=" _ id:_id _
     "{" _ elements:protocolelement* "}" _
   { return { kind: kind, name: name, id: id, elements: elements, pos: savedPos0 }; }
 

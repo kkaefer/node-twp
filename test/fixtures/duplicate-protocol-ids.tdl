@@ -1,0 +1,11 @@
+protocol Echo = ID 2 {
+  message Request=0 {
+    string text;
+  }
+}
+
+protocol EchoAnswer = ID 2 {
+  message Reply=0 {
+    string text;
+  }
+}

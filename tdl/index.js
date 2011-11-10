@@ -24,7 +24,9 @@ function Interface(input) {
     this.types = {};
     this.protocols = {};
     this.messages = {};
-    this.identifiers = {};
+
+    this.byName = {};
+    this.byID = {};
 
     if (input) {
         this.add(input);
@@ -89,8 +91,8 @@ Interface.prototype.position = function(pos) {
 }
 
 Interface.prototype.ensureDefined = function() {
-    for (var identifier in this.identifiers) {
-        var entity = this.identifiers[identifier];
+    for (var name in this.byName) {
+        var entity = this.byName[name];
         if (entity.kind === 'typedef') {
             var message = 'Type "' + entity.name.value + '" was declared but not defined.';
             throw new SemanticError(message, this.position(entity.pos));
@@ -99,7 +101,7 @@ Interface.prototype.ensureDefined = function() {
 };
 
 Interface.prototype.declareIdentfier = function(entity) {
-    var type = this.identifiers[entity.name.value];
+    var type = this.byName[entity.name.value];
     var typedef = entity.kind === 'typedef';
     if (type && (type.kind !== 'typedef' || typedef)) {
         var pos = this.position(type.pos);
@@ -112,7 +114,22 @@ Interface.prototype.declareIdentfier = function(entity) {
             'on line ' + pos.line + ', column ' + pos.column + '.';
         throw new SemanticError(message, this.position(entity.pos));
     }
-    this.identifiers[entity.name.value] = entity;
+    this.byName[entity.name.value] = entity;
+};
+
+Interface.prototype.validateID = function(cur) {
+    if (!this.byID[cur.kind]) this.byID[cur.kind] = {};
+    if (this.byID[cur.kind][cur.id]) {
+        var prev = this.byID[cur.kind][cur.id];
+        var pos = this.position(prev.pos);
+        var message = 'Can\'t use ID ' + cur.id + ' ' +
+            'to define ' + cur.kind + ' ' + cur.name.value + '. ' +
+            'It was previously used ' +
+            'to define ' + prev.kind + ' ' + prev.name.value + ' ' +
+            'on line ' + pos.line + ', column ' + pos.column + '.';
+        throw new SemanticError(message, this.position(cur.pos));
+    }
+    this.byID[cur.kind][cur.id] = cur;
 };
 
 Interface.prototype.ensureType = function(name) {
@@ -128,6 +145,7 @@ Interface.prototype.validateEntity = function(entity) {
 }
 
 Interface.prototype.validateProtocol = function(entity) {
+    this.validateID(entity);
     entity.elements.forEach(this.validateEntity, this);
     this.protocols[entity.name.value] = true;
 };
@@ -145,7 +163,7 @@ Interface.prototype.validateField = function(field, locals) {
     var name = field.name.value;
     // Ensure that the name has not yet been taken.
 
-    var previous = locals[name] || this.identifiers[name];
+    var previous = locals[name] || this.byName[name];
     if (previous) {
         var pos = this.position(previous.pos);
         var type = previous.type ? (previous.type.value || previous.type ) : previous.kind;
@@ -180,11 +198,13 @@ Interface.prototype.validateFields = function(fields, locals) {
 };
 
 Interface.prototype.validateStruct = function(entity) {
+    this.validateID(entity);
     this.validateFields(entity.fields, {});
     this.types[entity.name.value] = true;
 };
 
 Interface.prototype.validateMessage = function(entity) {
+    this.validateID(entity);
     this.validateFields(entity.fields, {});
     this.messages[entity.name.value] = true;
 };
@@ -203,7 +223,7 @@ Interface.prototype.validateUnion = function(entity) {
             throw new SemanticError(message, this.position(field.pos));
         }
         cases[field.number] = field;
-        this.validateField(field, this.identifiers);
+        this.validateField(field, this.byName);
     }, this);
     this.types[entity.name.value] = true;
 };
