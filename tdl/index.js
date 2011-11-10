@@ -44,7 +44,7 @@ Interface.prototype.add = function(input, filename) {
             ast.forEach(this.validateEntity, this);
 
             // Make sure that all typedefs have been defined later on.
-            this.ensureDefined();
+            this.findIncomplete();
         } finally {
             delete this._currentInput;
         }
@@ -90,7 +90,8 @@ Interface.prototype.position = function(pos) {
     return { line: line, column: column };
 }
 
-Interface.prototype.ensureDefined = function() {
+// Finds typedefs that aren't followed by an actual definition.
+Interface.prototype.findIncomplete = function() {
     for (var name in this.byName) {
         var entity = this.byName[name];
         if (entity.kind === 'typedef') {
@@ -100,7 +101,8 @@ Interface.prototype.ensureDefined = function() {
     }
 };
 
-Interface.prototype.declareIdentfier = function(entity) {
+// Ensures that the name isn't yet used and reserves it for this entity.
+Interface.prototype.validateName = function(entity) {
     var type = this.byName[entity.name.value];
     var typedef = entity.kind === 'typedef';
     if (type && (type.kind !== 'typedef' || typedef)) {
@@ -117,6 +119,7 @@ Interface.prototype.declareIdentfier = function(entity) {
     this.byName[entity.name.value] = entity;
 };
 
+// Ensures that the ID isn't yet used for this entity's kind.
 Interface.prototype.validateID = function(cur) {
     if (!this.byID[cur.kind]) this.byID[cur.kind] = {};
     if (this.byID[cur.kind][cur.id]) {
@@ -132,7 +135,8 @@ Interface.prototype.validateID = function(cur) {
     this.byID[cur.kind][cur.id] = cur;
 };
 
-Interface.prototype.ensureType = function(name) {
+// Ensures that the referenced type is declared or defined.
+Interface.prototype.validateType = function(name) {
     if (name.value && !this.types[name.value]) {
         var message = 'Type "' + name.value + '" is not declared.';
         throw new SemanticError(message, this.position(name.pos));
@@ -140,7 +144,7 @@ Interface.prototype.ensureType = function(name) {
 };
 
 Interface.prototype.validateEntity = function(entity) {
-    this.declareIdentfier(entity);
+    this.validateName(entity);
     this['validate' + ucfirst(entity.kind)](entity);
 }
 
@@ -155,7 +159,7 @@ Interface.prototype.validateTypedef = function(entity) {
 };
 
 Interface.prototype.validateSequence = function(entity) {
-    this.ensureType(entity.contains);
+    this.validateType(entity.contains);
     this.types[entity.name.value] = true;
 };
 
@@ -185,7 +189,7 @@ Interface.prototype.validateField = function(field, locals) {
     // Ensure that the referenced type has been declared. We only check
     // "complex" user-defined types that are a value/pos object.
     if (field.type.value) {
-        this.ensureType(field.type);
+        this.validateType(field.type);
     }
 
     locals[field.name.value] = field;
