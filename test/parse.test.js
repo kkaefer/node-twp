@@ -1,6 +1,6 @@
 var assert = require('assert');
 var fs = require('fs');
-var tdl = require('../lib/tdl');
+var api = require('../lib/api');
 
 var tests = {
     'empty': null,
@@ -65,7 +65,7 @@ var tests = {
 for (var name in tests) (function(test, name) {
     exports[name] = function() {
         try {
-            new tdl.Interface().addFile('test/fixtures/' + name + '.tdl');
+            api.fromFile('test/fixtures/' + name + '.tdl');
         } catch (err) {
             var thrown = true;
             if (!test) throw err;

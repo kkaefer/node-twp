@@ -1,16 +1,15 @@
 var tdl = require('./lib/tdl');
 var twp = require('./lib/twp');
 
-var api = new tdl.Interface(sample);
+var api = new tdl.Interface();
 api.addFile('./misc/echo.tdl');
 
-var protocol = api.getProtocol('Echo');
-
-var client = new twp.Client(protocol);
+var client = new twp.Client(api.protocol.Echo);
 client.connect(8000, 'localhost');
 client.on('connect', function() {
     client.send('Request', {
-        text: 'foo'
+        text: 'foo',
+        anytype: new api.type.Imaginary()
     });
 
     client.on('message', function(name, content) {

@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var tdl = require('../lib/tdl');
+var api = require('../lib/api');
 
 if (process.argv.length !== 3) {
     console.warn('Usage: ' + process.env._ + ' [filename]');
@@ -19,8 +19,7 @@ try {
 }
 
 try {
-    var api = new tdl.Interface();
-    api.addFile(filename);
+    api.fromFile(filename);
 } catch(err) {
     console.warn(err.stack);
     process.exit(1);
