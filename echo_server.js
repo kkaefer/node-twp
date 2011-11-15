@@ -1,11 +1,14 @@
-var tdl = require('./lib/tdl');
+var tdl = require('./lib/api');
 var twp = require('./lib/twp');
 
-var api = new tdl.Interface();
-api.addFile('./misc/echo.tdl');
+var api = tdl.fromFile('./misc/echo.tdl');
 
-var server = new twp.Server(api.protocol.Echo);
-server.listen(8000, 'localhost');
+var server = new twp.Server(api);
+
+server.listen(8000, 'localhost', function() {
+    var address = server.server.address();
+    console.warn('Listening on ' + address.address + ' on port ' + address.port);
+});
 server.on('connection', function(connection) {
     connection.on('message', reply);
 });
