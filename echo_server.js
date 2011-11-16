@@ -13,8 +13,8 @@ server.on('connection', function(connection) {
     connection.on('message', reply);
 });
 
-function reply(message) {
-    if (message.$name == 'Request') {
+function reply(name, content) {
+    if (name != 'Request') {
         this.messageError(message, "Message type not implemented");
     } else {
         this.send('Reply', {
