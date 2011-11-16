@@ -8,9 +8,15 @@ if (process.argv.length !== 3) {
     process.exit(1);
 }
 
+
+var host = 'www.dcl.hpi.uni-potsdam.de';
+var address = host;
+var port = 80;
+
 var client = new twp.Client(api.protocols.byName['Echo']);
 
-client.connect(80, 'www.dcl.hpi.uni-potsdam.de');
+console.warn('Connecting to ' + address + ' on port ' + port);
+client.connect(port, address);
 
 client.on('connect', function() {
     var string = process.argv[2];
