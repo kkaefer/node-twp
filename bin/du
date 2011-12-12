@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+
+var TFS = require('../tfs');
+
+
+if (process.argv.length !== 3) {
+    console.warn('Usage: ' + process.env._ + ' "string"');
+    process.exit(1);
+}
+
+
+var host = 'www.dcl.hpi.uni-potsdam.de';
+var address = host;
+var port = 80;
+
+var client = new TFS();
+client.connect(port, address);
+
+
+function formatSize(size) {
+    return size;
+    // var symbol = '';
+    // if (size >= 1e6) {
+    //     size /= 1e6;
+    //     symbol = 'M';
+    // } else if (size >= 1e3) {
+    //     size /= 1e3;
+    //     symbol = 'K';
+    // } else {
+    //     symbol = 'B';
+    // }
+
+    // if (size >= 100) return size.toFixed(0) + symbol;
+    // else if (size >= 10) return ' ' + size.toFixed(0) + symbol;
+    // else if (size === 0) return '  ' + size.toFixed(0) + symbol;
+    // else return size.toFixed(1) + symbol;
+}
+
+
+var folders = [];
+
+function sizeDir(dir, done) {
+    var size = 0;
+    if (dir[0] !== '/') dir = '/' + dir;
+    var plain_dir = dir;
+    if (dir[dir.length - 1] !== '/') dir += '/';
+
+    client.listdir(dir, function(err, result) {
+        if (err) return done(err);
+        iterate(null, 0);
+
+        function iterate(err, s) {
+            if (err) return done(err);
+            size += s;
+            if (result.directories.length) {
+                sizeDir(dir + result.directories.shift(), iterate);
+            } else if (result.files.length) {
+                var file = result.files.shift();
+                client.stat(dir, file, function(err, stat) {
+                    console.log(formatSize(stat.size) + '\t.' + dir + file);
+                    iterate(err, stat.size);
+                });
+            } else {
+                console.log(formatSize(size) + '\t.' + plain_dir);
+                done(null, size);
+            }
+        }
+    });
+}
+
+sizeDir(process.argv[2], function(err, size) {
+    if (err) throw err;
+    client.client.close();
+});
