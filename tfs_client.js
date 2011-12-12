@@ -50,11 +50,15 @@ client.connect(port, address);
 //     });
 // });
 
-// client.monitor('', 1, '127.0.0.1', 22, function(err, handle) {
+// client.monitor('', 1, '141.89.89.60', 8000, function(err, handle) {
 //     if (err) throw err;
-//     console.warn(handle);
-//     client.stop_monitoring(handle, function(err) {
-//         if (err) throw err;
-//         console.warn('removed');
+//     console.warn('Monitoring enabled.');
+//     process.on('SIGINT', function() {
+//         console.warn('Disabling monitoring...');
+//         client.stop_monitoring(handle, function(err) {
+//             if (err) throw err;
+//             console.warn('Monitoring disabled');
+//             process.exit(0);
+//         });
 //     });
 // });
