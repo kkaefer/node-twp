@@ -8,10 +8,9 @@ if (process.argv.length !== 3) {
     process.exit(1);
 }
 
-
-var host = 'www.dcl.hpi.uni-potsdam.de';
+var host = '::1';
 var address = host;
-var port = 80;
+var port = 8000;
 
 var client = new twp.Client(api.protocols.byName['Echo']);
 

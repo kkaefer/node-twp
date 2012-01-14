@@ -5,7 +5,7 @@ var api = tdl.fromFile('./misc/echo.tdl');
 
 var server = new twp.Server(api);
 
-server.listen(8000, 'localhost', function() {
+server.listen(8000, '::', function() {
     var address = server.server.address();
     console.warn('Listening on ' + address.address + ' on port ' + address.port);
 });

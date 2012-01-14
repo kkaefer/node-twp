@@ -222,3 +222,6 @@ TFS.prototype.stop_monitoring = function(handle, fn) {
     });
 };
 
+TFS.prototype.end = function() {
+    this.client.close();
+};
