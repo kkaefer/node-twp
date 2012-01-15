@@ -24,7 +24,7 @@ var expr = {
     ]
 }
 
-calculator(expr, function(err, result) {
+calculator(expr, [], function(err, result) {
     if (err) throw err;
     console.warn('Result: ' + result);
 });

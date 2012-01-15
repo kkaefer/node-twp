@@ -1,0 +1,8 @@
+// To discover recursion, the server checks all ThreadID extensions appended to
+// a message for a match with its own UUID. When it can't find one, it adds a
+// new ThreadID extension with its UUID to all outgoing requests. The server
+// generates a UUID on startup. UUIDs are not preserved across server restarts.
+
+struct ThreadID = ID 61 {
+    binary uuid;
+}
