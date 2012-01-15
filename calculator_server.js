@@ -97,8 +97,9 @@ Object.keys(operations).forEach(function(port) {
         var address = socket.remoteAddress + ':' + socket.remotePort;
         console.warn('[' + address + ']: New connection on port ' + port);
 
-        connection.on('message', function(name, content) {
+        connection.on('message', function(name, content, extensions) {
             console.warn('[' + address + ']: Message ' + name);
+            console.warn(extensions);
             if (name === 'Request') {
                 handleRequest(fn, connection, content);
             } else {
