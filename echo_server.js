@@ -17,7 +17,7 @@ function reply(name, content) {
     if (name != 'Request') {
         this.messageError(message, "Message type not implemented");
     } else {
-        this.send('Reply', {
+        this.sendReply({
             text: content.text,
             number_of_letters: content.text.length
         });

@@ -1,18 +1,17 @@
-protocol Calculator = ID 5 {
+
+protocol Calculator = ID 5{
   typedef Term;
   sequence<Term> parameters;
   struct Expression{
     binary host; /* IPv4 or IPv6 address */
     int port;
-	any defined by port otherPort;
     parameters arguments;
   }
 
-  union Term {
-    case 0: int value;
+  union Term{
+    case 0: double value;
     case 1: Expression expr;
   }
-
 
   message Request = 0 {
     int request_id;
@@ -21,7 +20,7 @@ protocol Calculator = ID 5 {
 
   message Reply = 1 {
     int request_id;
-    int result;
+    double result;
   }
 
   message Error = 2{

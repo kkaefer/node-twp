@@ -21,9 +21,7 @@ client.on('connect', function() {
     var string = process.argv[2];
     console.warn('Measuring "' + string + '"');
 
-    client.send('Request', {
-        text: string
-    });
+    client.sendRequest({ text: string });
 
     client.on('message', function(name, content) {
         console.warn(name, content);
