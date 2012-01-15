@@ -1,8 +1,10 @@
-var tdl = require('./lib/api');
-var twp = require('./lib/twp');
+var uuid = require('node-uuid');
 var Step = require('step');
 
-var api = tdl.fromFile('./misc/calc.tdl');
+var Server = require('./lib/server');
+var api = require('./lib/tdl').fromFiles(['./misc/calc.tdl', './misc/threadid.tdl']);
+var calculator = require('./calculator');
+
 
 var operations = {
     9001: function(o) { // +
@@ -56,43 +58,33 @@ var operations = {
     }
 };
 
-function bufferToAddress(b) {
-    if (b.length === 4) {
-        return b[0] + '.' + b[1] + '.' + b[2] + '.' + b[3];
-    } else if (b.length === 16) {
-        var address = [];
-        for (var i = 0; i < 16; i += 2) {
-            address.push(b.toString('hex', i, i + 2));
+function handleRequest(fn, connection, content) {
+    // Resolve all operands.
+    Step(function() {
+        var group = this.group();
+        content.arguments.forEach(function(operand) {
+            if (operand.expr) calculator(operand.expr, group());
+            else group()(null, operand.value);
+        });
+    }, function(err, operands) {
+        if (err) {
+            connection.sendError({
+                text: err.message
+            });
+        } else {
+            // Compute result.
+            var result = fn(operands);
+            connection.sendReply({
+                request_id: content.request_id,
+                result: result
+            });
         }
-        return address.join(':');
-    }
-    throw new Error('invalid ip address');
-}
-
-function resolve(term, next) {
-    var client = new twp.Client(api.protocols.byName['Calculator']);
-    var address = bufferToAddress(term.host);
-
-    console.warn('Connecting to ' + address + ' on port ' + term.port);
-    client.connect(term.port, address);
-
-    client.on('connect', function() {
-        client.sendRequest({
-            request_id: 0,
-            arguments: term.arguments
-        });
-
-        client.on('message', function(name, content) {
-            client.close();
-            if (name !== 'Reply') next(new Error('did not receive a reply'));
-            next(null, content.result);
-        });
     });
 }
 
 Object.keys(operations).forEach(function(port) {
     var fn = operations[port];
-    var server = new twp.Server(api);
+    var server = new Server(api);
 
     server.listen(port, '::', function() {
         var address = server.server.address();
@@ -107,26 +99,11 @@ Object.keys(operations).forEach(function(port) {
 
         connection.on('message', function(name, content) {
             console.warn('[' + address + ']: Message ' + name);
-
-            // Resolve all
-            Step(function() {
-                var group = this.group();
-                content.arguments.forEach(function(operand) {
-                    if (operand.expr) resolve(operand.expr, group());
-                    else group()(null, operand.value);
-                });
-            }, function(err, operands) {
-                if (err) {
-                    connection.sendError({
-                        text: err.message
-                    });
-                } else {
-                    connection.sendReply({
-                        request_id: content.request_id,
-                        result: fn(operands)
-                    });
-                }
-            });
+            if (name === 'Request') {
+                handleRequest(fn, connection, content);
+            } else {
+                throw new Error('Didn\'t expect message ' + name);
+            }
         });
 
         connection.on('error', function(err) {

@@ -1,7 +1,5 @@
-var tdl = require('./lib/api');
-var twp = require('./lib/twp');
-
-var api = tdl.fromFile('./misc/echo.tdl');
+var Client = require('./lib/client');
+var api = require('./lib/tdl').fromFile('./misc/echo.tdl');
 
 if (process.argv.length !== 3) {
     console.warn('Usage: ' + process.env._ + ' "string"');
@@ -12,7 +10,7 @@ var host = '::1';
 var address = host;
 var port = 8000;
 
-var client = new twp.Client(api.protocols.byName['Echo']);
+var client = new Client(api.protocols.Echo);
 
 console.warn('Connecting to ' + address + ' on port ' + port);
 client.connect(port, address);

@@ -1,7 +1,5 @@
-var tdl = require('./lib/api');
-var twp = require('./lib/twp');
-
-var api = tdl.fromFile('./misc/rpc.tdl');
+var Client = require('./lib/client');
+var api = require('./lib/tdl').fromFile('./misc/rpc.tdl');
 
 function formatDir(dir) {
     return Array.isArray(dir) ?

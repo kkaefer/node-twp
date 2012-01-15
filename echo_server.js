@@ -1,9 +1,7 @@
-var tdl = require('./lib/api');
-var twp = require('./lib/twp');
+var Server = require('./lib/server');
+var api = require('./lib/tdl').fromFile('./misc/echo.tdl');
 
-var api = tdl.fromFile('./misc/echo.tdl');
-
-var server = new twp.Server(api);
+var server = new Server(api);
 
 server.listen(8000, '::', function() {
     var address = server.server.address();

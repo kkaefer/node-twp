@@ -9,6 +9,11 @@
       "validate": "./bin/validate"
   },
 
+  "dependencies": {
+    "step": "~0.0.5",
+    "uuid": "~0.0.2"
+  }
+
   "devDependencies": {
       "expresso": "~0.9.0"
   }
