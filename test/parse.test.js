@@ -1,6 +1,6 @@
 var assert = require('assert');
 var fs = require('fs');
-var api = require('../lib/api');
+var tdl = require('../lib/tdl');
 
 var tests = {
     'empty': null,
@@ -65,7 +65,7 @@ var tests = {
 for (var name in tests) (function(test, name) {
     exports[name] = function() {
         try {
-            api.fromFile('test/fixtures/' + name + '.tdl');
+            tdl.fromFile('test/fixtures/' + name + '.tdl');
         } catch (err) {
             var thrown = true;
             if (!test) throw err;
@@ -74,8 +74,8 @@ for (var name in tests) (function(test, name) {
             assert.equal(test.column, err.column);
         }
         if (!thrown && test) {
-            throw new Error('Expected error ' + test.message +
-                ' on line ' + test.line + ', column ' + test.column);
+            throw new Error('Expected error `' + test.message +
+                '` on line ' + test.line + ', column ' + test.column);
         }
     };
 })(tests[name], name);
