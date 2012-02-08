@@ -14,8 +14,8 @@ function bufferToAddress(b) {
     throw new Error('invalid ip address');
 }
 
-module.exports = function(term, extensions, next) {
-    var client = new Client(api.protocols.Calculator);
+module.exports = function(term, extensions, next, options) {
+    var client = new Client(api.protocols.Calculator, options);
     var address = bufferToAddress(term.host);
 
     console.warn('Connecting to ' + address + ' on port ' + term.port);
@@ -32,7 +32,15 @@ module.exports = function(term, extensions, next) {
             client.close();
             if (name !== 'Reply') console.warn(content);
             if (name !== 'Reply') next(new Error('did not receive a reply'));
-            next(null, content.result);
+            next.call(client, null, content.result);
+        });
+
+        client.on('untrustedMessage', function(err, name, content) {
+            console.warn(client.id, 'INVALID MESSAGE', err.message, name, content);
+        });
+
+        client.on('authenticationError', function(code, description, detail) {
+            console.warn(client.id, 'AUTHENTICATION ERROR', code, description, detail);
         });
     });
 };

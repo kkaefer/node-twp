@@ -1,8 +1,4 @@
 
-message Doom = 2 {
-  string boo;
-}
-
 protocol Calculator = ID 5{
   typedef Term;
   sequence<Term> parameters;

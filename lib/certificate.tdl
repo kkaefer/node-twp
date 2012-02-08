@@ -1,0 +1,27 @@
+message Certificate = ID 27 {
+  binary data; /* DER-encoded Certificate as defined in RFC 3280 */
+}
+
+/* Message and structure signing. Input to the signature are the
+   encoded TWP data of the fields of the message or struct up to
+   this extension value. */
+struct Signature = ID 28 {
+  binary data; /* SHA1 with RSA encryption, algorithm 1.2.840.113549.1.1.5,
+                  as defined in RFC 2437 */
+}
+
+message AuthenticationError = ID 29 {
+  /* 0 - other error
+     1 - bad certificate
+     2 - unsupported certificate
+     3 - certificate revoked
+     4 - certificate expired
+     5 - certificate unknown
+     6 - illegal parameter
+     7 - unknown ca
+     8 - access denied
+     9 - bad MAC
+    10 - certificate not yet valid */
+  int code;
+  string detail;
+}
